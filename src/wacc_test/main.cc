@@ -11,8 +11,9 @@ static constexpr int IMPLEMENTED_STAGES = 1;
 class StageIterator
 {
     std::filesystem::recursive_directory_iterator m_it;
+    int m_stage;
 
-    static bool is_implemented_stage(const std::filesystem::path& path)
+    bool is_implemented_stage(const std::filesystem::path& path)
     {
         if (std::filesystem::is_directory(path))
         {
@@ -28,7 +29,12 @@ class StageIterator
                 if (std::from_chars(name.data() + sizeof(prefix) - 1, name.data() + name.size(), stage).ec ==
                     std::errc{})
                 {
-                    return stage <= IMPLEMENTED_STAGES;
+                    if (stage <= IMPLEMENTED_STAGES)
+                    {
+                        m_stage = stage;
+                        return true;
+                    }
+                    return false;
                 }
             }
         }
@@ -46,6 +52,7 @@ class StageIterator
     {
         typename std::filesystem::recursive_directory_iterator::value_type data;
         bool is_valid;
+        int stage;
 
         friend std::ostream& operator<<(std::ostream& os, const Value& value)
         {
@@ -88,7 +95,7 @@ class StageIterator
 
     Value operator*() const
     {
-        return {*m_it, is_valid(m_it->path())};
+        return {*m_it, is_valid(m_it->path()), m_stage};
     }
 };
 
@@ -139,7 +146,10 @@ INSTANTIATE_TEST_SUITE_P(Run,
     WaccTest,
     testing::ValuesIn(StageIterator{true}, StageIterator{}),
     [](const testing::TestParamInfo<typename std::iterator_traits<StageIterator>::value_type>& info) {
-        std::string name = info.param.data.path().filename().string().replace(
+        std::ostringstream result;
+        result << "stage" << info.param.stage;
+        result << (info.param.is_valid ? "_valid_" : "_invalid_");
+        result << info.param.data.path().filename().string().replace(
             info.param.data.path().filename().string().find("."), 1, "_");
-        return (info.param.is_valid ? "valid_" : "invalid_") + name;
+        return result.str();
     });
