@@ -29,5 +29,5 @@ void wacc::CodeGenerator::exitStatement(CParser::StatementContext* ctx)
 
 void wacc::CodeGenerator::enterExpression(CParser::ExpressionContext* ctx)
 {
-    output << "mov rax, " << ctx->getText() << "\n";
+    output << "mov rax, " << ctx->NUM()->getText() << "\n";
 }
