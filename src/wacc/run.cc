@@ -8,6 +8,7 @@
 #include <CParser.h>
 #include <antlr4-runtime.h>
 #include <rang.hpp>
+#include <subprocess.hpp>
 
 int wacc::run(std::span<const char*> args, std::ostream& out, std::ostream& err)
 {
@@ -44,9 +45,23 @@ int wacc::run(std::span<const char*> args, std::ostream& out, std::ostream& err)
     {
         return 1;
     }
-    std::ofstream output_stream{output_path};
-    CodeGenerator gen{output_stream};
-    antlr4::tree::ParseTreeWalker::DEFAULT.walk(&gen, tree);
+    {
+        std::ofstream output_stream{"a.s"};
+        CodeGenerator gen{output_stream};
+        antlr4::tree::ParseTreeWalker::DEFAULT.walk(&gen, tree);
+    }
+
+    subprocess::CompletedProcess nasm_process = subprocess::run({"nasm", "-f", "elf64", "-o", "a.o", "a.s"});
+    if (nasm_process.returncode != 0)
+    {
+        return 1;
+    }
+
+    subprocess::CompletedProcess ld_process = subprocess::run({"ld", "-o", output_path.string(), "a.o"});
+    if (ld_process.returncode != 0)
+    {
+        return 1;
+    }
 
     return 0;
 }

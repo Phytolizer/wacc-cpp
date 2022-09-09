@@ -54,7 +54,7 @@ target_include_directories(
   PUBLIC include
 )
 target_compile_features(wacc PUBLIC cxx_std_20)
-target_link_libraries(wacc PRIVATE antlr4_static CLI11::CLI11 rang)
+target_link_libraries(wacc PRIVATE antlr4_static CLI11::CLI11 rang subprocess)
 
 add_executable(wacc_driver src/wacc_driver/main.cc)
 target_link_libraries(wacc_driver PRIVATE wacc)
