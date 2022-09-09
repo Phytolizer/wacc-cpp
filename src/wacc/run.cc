@@ -8,7 +8,7 @@
 #include <antlr4-runtime.h>
 #include <rang.hpp>
 
-int wacc::run(std::span<char*> args)
+int wacc::run(std::span<const char*> args)
 {
     CLI::App app{"What A C Compiler"};
     CLI::Option* file_opt = app.add_option("FILE", "The file to compile")->required()->check(CLI::ExistingFile);

@@ -3,5 +3,5 @@
 
 int main(int argc, char** argv)
 {
-    return wacc::run({argv, static_cast<std::size_t>(argc)});
+    return wacc::run({const_cast<const char**>(argv), static_cast<std::size_t>(argc)});
 }

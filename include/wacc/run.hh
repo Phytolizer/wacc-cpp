@@ -5,6 +5,6 @@
 namespace wacc
 {
 
-int run(std::span<char*> args);
+int run(std::span<const char*> args);
 
 }

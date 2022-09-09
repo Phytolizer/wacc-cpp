@@ -32,6 +32,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
+FetchContent_Declare(
+  subprocess
+  GIT_REPOSITORY https://github.com/benman64/subprocess.git
+  GIT_TAG v0.4.0
+)
+FetchContent_MakeAvailable(subprocess)
+
 antlr_target(
   WaccParser ${CMAKE_CURRENT_SOURCE_DIR}/src/wacc/C.g4 LEXER PARSER LISTENER
   PACKAGE wacc
@@ -55,7 +62,7 @@ configure_file(cmake/config.hh.cmake-in include/config.hh)
 
 enable_testing()
 add_executable(wacc_test src/wacc_test/main.cc)
-target_link_libraries(wacc_test PRIVATE wacc gtest_main)
+target_link_libraries(wacc_test PRIVATE wacc gtest_main subprocess)
 target_include_directories(
   wacc_test PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include
 )
