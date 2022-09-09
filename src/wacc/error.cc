@@ -9,21 +9,19 @@ void wacc::ErrorListener::syntaxError(antlr4::Recognizer* recognizer,
     size_t line,
     size_t column,
     const std::string& msg,
-    std::exception_ptr e)
+    std::exception_ptr /*e*/)
 {
     std::string source_name = recognizer->getInputStream()->getSourceName();
     if (!source_name.empty())
     {
         err << source_name << ":";
     }
-    err << line << ":" << column << ": error: " << msg << '\n';
+    err << line << ":" << column + 1 << ": error: " << msg << '\n';
 
-    try
-    {
-        std::rethrow_exception(e);
-    }
-    catch (antlr4::RecognitionException&)
-    {
-        std::throw_with_nested(antlr4::ParseCancellationException{});
-    }
+    m_nerrors++;
+}
+
+std::size_t wacc::ErrorListener::nerrors() const noexcept
+{
+    return m_nerrors;
 }

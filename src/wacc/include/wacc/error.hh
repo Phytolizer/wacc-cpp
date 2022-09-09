@@ -9,6 +9,7 @@ class ErrorListener : public antlr4::BaseErrorListener
 {
   private:
     std::ostream& err;
+    std::size_t m_nerrors = 0;
 
   public:
     ErrorListener(std::ostream& err);
@@ -19,6 +20,8 @@ class ErrorListener : public antlr4::BaseErrorListener
         size_t column,
         const std::string& msg,
         std::exception_ptr e) override;
+
+    [[nodiscard]] std::size_t nerrors() const noexcept;
 };
 
 } // namespace wacc

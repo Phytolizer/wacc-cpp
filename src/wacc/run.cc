@@ -37,14 +37,10 @@ int wacc::run(std::span<const char*> args, std::ostream& out, std::ostream& err)
     lexer.addErrorListener(&error_listener);
     antlr4::CommonTokenStream tokens{&lexer};
     CParser parser{&tokens};
+    parser.removeErrorListeners();
     parser.addErrorListener(&error_listener);
-    parser.setErrorHandler(std::make_shared<antlr4::BailErrorStrategy>());
-    antlr4::tree::ParseTree* tree;
-    try
-    {
-        tree = parser.program();
-    }
-    catch (const antlr4::ParseCancellationException&)
+    antlr4::tree::ParseTree* tree = parser.program();
+    if (error_listener.nerrors() > 0)
     {
         return 1;
     }
