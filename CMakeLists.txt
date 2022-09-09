@@ -25,6 +25,13 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(rang)
 
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG release-1.12.1
+)
+FetchContent_MakeAvailable(googletest)
+
 antlr_target(
   WaccParser ${CMAKE_CURRENT_SOURCE_DIR}/src/wacc/C.g4 LEXER PARSER LISTENER
   PACKAGE wacc
@@ -43,3 +50,13 @@ target_link_libraries(wacc PRIVATE antlr4_static CLI11::CLI11 rang)
 
 add_executable(wacc_driver src/wacc_driver/main.cc)
 target_link_libraries(wacc_driver PRIVATE wacc)
+
+configure_file(cmake/config.hh.cmake-in include/config.hh)
+
+enable_testing()
+add_executable(wacc_test src/wacc_test/main.cc)
+target_link_libraries(wacc_test PRIVATE wacc gtest_main)
+target_include_directories(
+  wacc_test PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/include
+)
+add_test(NAME wacc_test COMMAND wacc_test)
