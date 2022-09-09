@@ -1,6 +1,7 @@
 #include "wacc/run.hh"
 
 #include "wacc/codegen.hh"
+#include "wacc/error.hh"
 
 #include <CLI/CLI.hpp>
 #include <CLexer.h>
@@ -8,7 +9,7 @@
 #include <antlr4-runtime.h>
 #include <rang.hpp>
 
-int wacc::run(std::span<const char*> args)
+int wacc::run(std::span<const char*> args, std::ostream& out, std::ostream& err)
 {
     CLI::App app{"What A C Compiler"};
     CLI::Option* file_opt = app.add_option("FILE", "The file to compile")->required()->check(CLI::ExistingFile);
@@ -20,21 +21,35 @@ int wacc::run(std::span<const char*> args)
     }
     catch (const CLI::ParseError& e)
     {
-        std::cout << (e.get_exit_code() == 0 ? rang::fg::blue : rang::fg::red);
-        return app.exit(e);
+        out << (e.get_exit_code() == 0 ? rang::fg::blue : rang::fg::red);
+        return app.exit(e, out, err);
     }
 
     std::filesystem::path input_path = file_opt->as<std::string>();
     std::filesystem::path output_path = output_opt->as<std::string>();
 
+    ErrorListener error_listener{err};
+
     std::ifstream input{input_path};
     antlr4::ANTLRInputStream input_stream{input};
+    input_stream.name = input_path.string();
     CLexer lexer{&input_stream};
+    lexer.addErrorListener(&error_listener);
     antlr4::CommonTokenStream tokens{&lexer};
     CParser parser{&tokens};
-    antlr4::tree::ParseTree* tree = parser.program();
-    std::ofstream output{output_path};
-    CodeGenerator gen{output};
+    parser.addErrorListener(&error_listener);
+    parser.setErrorHandler(std::make_shared<antlr4::BailErrorStrategy>());
+    antlr4::tree::ParseTree* tree;
+    try
+    {
+        tree = parser.program();
+    }
+    catch (const antlr4::ParseCancellationException&)
+    {
+        return 1;
+    }
+    std::ofstream output_stream{output_path};
+    CodeGenerator gen{output_stream};
     antlr4::tree::ParseTreeWalker::DEFAULT.walk(&gen, tree);
 
     return 0;

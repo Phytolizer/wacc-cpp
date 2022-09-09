@@ -37,14 +37,8 @@ class StageIterator
 
     static bool is_valid(const std::filesystem::path& path)
     {
-        for (auto& p : std::filesystem::relative(path, PROJECT_SOURCE_DIR "/test"))
-        {
-            if (p == "valid")
-            {
-                return true;
-            }
-        }
-        return false;
+        auto p = std::filesystem::relative(path, PROJECT_SOURCE_DIR "/test");
+        return std::find_if(p.begin(), p.end(), [](const auto& p) { return p.string() == "valid"; }) != p.end();
     }
 
   public:
@@ -118,9 +112,15 @@ TEST_P(WaccTest, CompileParityWithGcc)
 {
     std::string input = GetParam().data.path().string();
     std::array args{"wacc", input.c_str(), "-o", "wacc.out"};
-    int wacc_ret = wacc::run(args);
+    std::ostringstream out;
+    std::ostringstream err;
+    int wacc_ret = wacc::run(args, out, err);
     if (GetParam().is_valid)
     {
+        if (wacc_ret != 0)
+        {
+            std::cerr << err.str() << '\n';
+        }
         EXPECT_EQ(wacc_ret, 0);
         subprocess::CompletedProcess gcc_process = subprocess::run({"gcc", input.c_str(), "-o", "gcc.out"});
         EXPECT_EQ(gcc_process.returncode, 0);

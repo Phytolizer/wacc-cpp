@@ -46,6 +46,7 @@ antlr_target(
 )
 add_library(
   wacc ${ANTLR_WaccParser_CXX_OUTPUTS} src/wacc/run.cc src/wacc/codegen.cc
+       src/wacc/error.cc
 )
 target_include_directories(
   wacc
