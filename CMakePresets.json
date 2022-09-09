@@ -25,7 +25,7 @@
             "name": "wflags",
             "hidden": true,
             "cacheVariables": {
-                "CMAKE_C_FLAGS": "-Wall -Wextra -Wpedantic -Wmissing-prototypes -Wno-unused-function"
+                "CMAKE_CXX_FLAGS": "-Wall -Wextra -Wpedantic"
             }
         },
         {
@@ -41,7 +41,6 @@
             "displayName": "x64 Debug (Sanitizers)",
             "inherits": ["dev", "wflags"],
             "cacheVariables": {
-                "CMAKE_C_FLAGS": "-fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer",
                 "CMAKE_CXX_FLAGS": "-fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer",
                 "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address -fsanitize=undefined"
             }
