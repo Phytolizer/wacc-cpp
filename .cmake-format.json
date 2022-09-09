@@ -5,11 +5,13 @@
             "Specify structure for custom cmake functions"
         ],
         "additional_commands": {
-            "foo": {
-                "flags": ["BAR", "BAZ"],
+            "antlr_target": {
+                "flags": ["LEXER", "PARSER", "LISTENER", "VISITOR"],
                 "kwargs": {
-                    "HEADERS": "*",
-                    "SOURCES": "*",
+                    "PACKAGE": 1,
+                    "OUTPUT_DIRECTORY": 1,
+                    "DEPENDS_ANTLR": 1,
+                    "COMPILE_FLAGS": "*",
                     "DEPENDS": "*"
                 }
             }
