@@ -1,6 +1,7 @@
 #include <iostream>
+#include <wacc/run.hh>
 
-int main()
+int main(int argc, char** argv)
 {
-    std::cout << "Hello, World!\n";
+    return wacc::run({argv, static_cast<std::size_t>(argc)});
 }
