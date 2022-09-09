@@ -13,7 +13,7 @@ class InvalidStageIterator
 {
     std::filesystem::recursive_directory_iterator m_it;
 
-    static bool is_implemented_stage(std::filesystem::path path)
+    static bool is_implemented_stage(const std::filesystem::path& path)
     {
         if (std::filesystem::is_directory(path))
         {
